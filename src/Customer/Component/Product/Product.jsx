@@ -1176,7 +1176,7 @@ const filters = [
     ],
   },
   {
-    id: 'Pattern',
+    id: 'pattern',
     name: 'Pattern',
     options: [
       { value: 'solids', label: 'Solids', checked: false },

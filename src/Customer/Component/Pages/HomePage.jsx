@@ -1,5 +1,7 @@
+import { useEffect, useState } from "react";
 import MainCarousel from "../HomeCarosal/MainCarosal";
 import { HomeSectionCarousel } from "../HomeSectionCarosal/HomeSectionCarasol";
+import { getProductByCategory } from "../Auth/API";
 
 export default function HomePage()
 {
@@ -146,16 +148,20 @@ export default function HomePage()
         }
     ]
     
-
+    const [item,setItem]=useState([])
+    useEffect(()=>loadPage,[])
+    async function loadPage(){
+       await getProductByCategory("Shirts").then((response)=>setItem(response.data)).catch((response)=>console.log(response))
+    }
     return (
         <div className="">
             
             <MainCarousel />
             <div>
-                <HomeSectionCarousel item={kurtaPage1} section={"Kurtas"} />
-                <HomeSectionCarousel item={kurtaPage1} section={"Kurtas 2002"} />
+                <HomeSectionCarousel item={item} section={"Shirts"} />
+                {/* <HomeSectionCarousel item={kurtaPage1} section={"Kurtas 2002"} />
                 <HomeSectionCarousel item={kurtaPage1} section={"Kurtas 2003"} />
-                <HomeSectionCarousel item={kurtaPage1} section={"Kurtas 2004"} />
+                <HomeSectionCarousel item={kurtaPage1} section={"Kurtas 2004"} /> */}
             </div>
         </div>
     )

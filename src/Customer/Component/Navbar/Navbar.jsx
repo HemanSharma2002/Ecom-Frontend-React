@@ -15,6 +15,10 @@
 import { Fragment, useState } from 'react'
 import { Dialog, Popover, Tab, Transition } from '@headlessui/react'
 import { Bars3Icon, MagnifyingGlassIcon, ShoppingBagIcon, XMarkIcon } from '@heroicons/react/24/outline'
+import { Formik,Form,Field } from 'formik'
+import { useAuth } from '../Auth/Authentication'
+import { useNavigate } from 'react-router-dom'
+// import { Formik } from 'formik'
 
 const navigation = {
   categories: [
@@ -144,10 +148,16 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
+  const authorization=useAuth();
   const [open, setOpen] = useState(false)
-
+  const[logAndCreat,setLogAndCreate]=useState(true)
+  const[auth,setAuth]=useState(authorization.isAuthenticated)
+  const[username,setUsername]=useState("")
+  const[email,setEmail]=useState("")
+  const navigate=useNavigate()
+  
   return (
-    <div className="bg-white">
+    <div className="bg-white relative">
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
@@ -271,6 +281,7 @@ export default function Navbar() {
                     </a>
                   </div>
                 </div>
+                
 
                 <div className="border-t border-gray-200 px-4 py-6">
                   <a href="#" className="-m-2 flex items-center p-2">
@@ -421,13 +432,17 @@ export default function Navbar() {
 
               <div className="ml-auto flex items-center">
                 <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
-                  <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                 {!auth && <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
                     Sign in
-                  </a>
-                  <span className="h-6 w-px bg-gray-200" aria-hidden="true" />
-                  <a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                  </a>}
+                  {!auth &&<span className="h-6 w-px bg-gray-200" aria-hidden="true" />}
+                  {!auth &&<a href="#" className="text-sm font-medium text-gray-700 hover:text-gray-800">
                     Create account
-                  </a>
+                  </a>}
+                  {!auth&&<span className="h-6 w-px bg-gray-200" aria-hidden="true" />}
+                  {auth&& <div className="text-sm font-medium text-gray-700 hover:text-gray-800 cursor-pointer" onClick={()=>navigate(`/`)}>
+                    {authorization.username}
+                  </div>}
                 </div>
 
                 <div className="hidden lg:ml-8 lg:flex">
@@ -451,7 +466,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Cart */}
-                <div className="ml-4 flow-root lg:ml-6">
+                <div className="ml-4 flow-root lg:ml-6" onClick={()=>navigate(`/cart`)} >
                   <a href="#" className="group -m-2 flex items-center p-2">
                     <ShoppingBagIcon
                       className="h-6 w-6 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
@@ -466,6 +481,78 @@ export default function Navbar() {
           </div>
         </nav>
       </header>
+      {/* Login/LogOut Pannel */}
+      {!auth &&<div className='h-screen w-full flex justify-center items-center absolute'>
+        {logAndCreat && <div className={`bg-white h-4/6 w-4/6 rounded-lg z-30 bg-opacity-90 flex justify-center items-center border-4 border-indigo-500`}>
+          <Formik initialValues={{username}} enableReinitialize={true} onSubmit={(prop)=>{
+            if(authorization.login(prop))
+            {
+              setAuth(true)}
+          }}>
+            {(prop)=>(
+              <Form className='flex flex-col items-center px-5'>
+                <fieldset className=' m-5'>
+                  <label className=' text-indigo-500 font-bold m-2 text-xl' htmlFor="">Username: </label>
+                  <Field className=" border-2 border-indigo-500 p-2" type="text" name="username"/>
+                </fieldset>
+                <fieldset className=' m-5'>
+                  <label className=' text-indigo-500 font-bold m-2 text-xl' htmlFor="">Password: </label>
+                  <Field className=" border-2 border-indigo-500 p-2" type="text" name="password"/>
+                </fieldset>
+                <div className=' m-5'><button className='bg-indigo-500 text-white pt-2 pb-3 px-4 rounded-lg'  type="submit">Login</button></div>
+                <div className='flex'>Click on the link to register a new user. <p className='text-indigo-500 mx-2 cursor-pointer' onClick={()=>setLogAndCreate(false)}>Register</p></div>
+
+              </Form>
+              
+            )}
+          </Formik>
+          
+        </div>}
+
+        {!logAndCreat && <div className={`bg-white h-4/6 w-4/6 rounded-lg z-30 bg-opacity-90 flex justify-center items-center border-4 border-indigo-500`}>
+          <Formik initialValues={{email}} enableReinitialize={true} onSubmit={(prop)=>{
+            if(authorization.createUser(prop)==true){
+              setLogAndCreate(true)
+            }
+          }}>
+            {(prop)=>(
+              <Form className='flex flex-col items-center '>
+                <div className=' flex flex-row'>
+                <fieldset className=' m-5'>
+                  <label className=' text-indigo-500 font-bold m-2 text-xl' htmlFor="">First Name: </label>
+                  <Field className=" border-2 border-indigo-500 p-2" type="text" name="firstName"/>
+                </fieldset>
+                <fieldset className=' m-5'>
+                  <label className=' text-indigo-500 font-bold m-2 text-xl' htmlFor="">Last Name: </label>
+                  <Field className=" border-2 border-indigo-500 p-2" type="text" name="lastName"/>
+                </fieldset>
+                </div>
+                <div className=' flex flex-col items-start w-full'>
+                <fieldset className=' m-5'>
+                  <label className=' text-indigo-500 font-bold m-2 text-xl' htmlFor="">Email : </label>
+                  <Field className=" border-2 border-indigo-500 p-2 w-96" type="text" name="email"/>
+                </fieldset>  
+                </div>
+                <div className=' flex flex-row'>
+                <fieldset className=' m-5'>
+                  <label className=' text-indigo-500 font-bold m-2 text-xl' htmlFor="">Password : </label>
+                  <Field className=" border-2 border-indigo-500 p-2" type="text" name="password"/>
+                </fieldset>
+                <fieldset className=' m-5'>
+                  <label className=' text-indigo-500 font-bold m-2 text-xl' htmlFor="">Confirm Password: </label>
+                  <Field className=" border-2 border-indigo-500 p-2" type="text" name="confirmPassword"/>
+                </fieldset>
+                </div>
+                <div className=' m-5'><button className='bg-indigo-500 text-white pt-2 pb-3 px-4 rounded-lg' type="submit">Login</button></div>
+                <div className='flex'>Already have a account . <p className='text-indigo-500 mx-2 cursor-pointer' onClick={()=>setLogAndCreate(true)}>Login</p></div>
+
+              </Form>
+              
+            )}
+          </Formik>
+          
+        </div>}
+      </div>}
     </div>
   )
 }

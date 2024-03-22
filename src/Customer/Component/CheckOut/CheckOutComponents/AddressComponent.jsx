@@ -1,4 +1,4 @@
-import { Phone } from '@mui/icons-material'
+import { Delete, Phone } from '@mui/icons-material'
 import React from 'react'
 
 
@@ -17,15 +17,18 @@ export const AddressComponent = ({addres}) => {
         <div className='  w-full p-2 px-5'>
             <div className=' font-semibold flex flex-row my-2'>
                 <p className=''>{addres.firstName}</p>
-                <p className=''>{addres.lastName}</p>
+                <p className=' mx-3'>{addres.lastName}</p>
             </div>
             <div>
-                <p>{addres.address} , {addres.city } , {addres.state}</p>
+                <p>{addres.streetAddress} , {addres.city } , {addres.state}</p>
                 <p className='text-gray-800'>{addres.pincode}</p>
             </div>
             <div className='my-2'>
                 <p className=' font-semibold'>Phone Number</p>
+                <div className=' flex flex-row justify-between'>
                 <p className=''><Phone className='text-indigo-500 mx-2'/>  {addres.mobile}</p>
+                <Delete className='text-indigo-500'/>
+                </div>
             </div>
         </div>
     </div>
